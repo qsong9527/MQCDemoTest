@@ -5,45 +5,35 @@ from unittest import TestCase
 from appium import webdriver
 
 import desired_capabilities
-# import app
+
+from app.login_act import LoginAct
+
+from utils.android_helper import AndroidHelper
+from utils.log_helper import Logger
 
 
-class MqcTest(TestCase):
+class MQCDemoTester(TestCase):
 
     global automationName
 
     def setUp(self):
+
         desired_caps = desired_capabilities.get_desired_capabilities()
         uri = desired_capabilities.get_uri()
         self.automationName = desired_caps.get('automationName')
         self.driver = webdriver.Remote(uri, desired_caps)
 
     def test_login(self):
-        # login_act = app.LoginAct()
-        # login_act.et_email.send_keys('qsong@thoughtworks.com')
-        # login_act.et_password.send_keys('Qa123456')
-        # login_act.bt_sign_in
-        # log_records = login_act.devices_log
 
-        et_email = self.driver.find_element_by_id('com.thoughtworks.qsong.mqcdemo:id/email')
-        et_email.send_keys('qsong@thoughtworks.com')
+        email = 'qsong@thoughtworks.com'
+        password = 'Qa123456'
 
-        et_password = self.driver.find_element_by_id('com.thoughtworks.qsong.mqcdemo:id/password')
-        et_password.send_keys('Qa123456')
+        LoginAct(self.driver).sign_in(email, password)
+        device_log = AndroidHelper.get_devices_log(self.driver)
+        Logger.d("Device Log => %s " % device_log)
 
-        log_records = self.driver.get_log('logcat')
-        print(log_records)
-        print(len(log_records))
-        assert len(log_records) > 0, \
-            'Get log failed.'
-
-    # def test_pass(self):
-    #     assert 1 == 1, \
-    #         'Test pass case failed.'
-    #
-    # def test_failed(self):
-    #     assert 1 == 2, \
-    #         'Test fail case failed.'
+        assert len(device_log) > 0, \
+            'Found device log error!'
 
     def tearDown(self):
         self.driver.quit()
